@@ -1,0 +1,6 @@
+Query,Raw Verdict,Clean Verdict,Faithfulness
+What medications is the patient currently taking and wh...,THE PATIENT IS TAKING MET,THE,1.0
+What are the patient lab values and which ones are abno...,HALLUCINATED,HALLUCINATED,0.0
+What kidney function findings are documented?...,PARTIALLY_FAITH,PARTIALLY_FAITH,0.5
+What is the radiology report finding and clinical impre...,PARTIALLY_FAITH,PARTIALLY_FAITH,0.5
+What is the progression of HbA1c across visits?...,THE ANSWER IS FAITH,THE,1.0

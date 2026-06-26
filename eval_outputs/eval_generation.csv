@@ -1,0 +1,11 @@
+Question,ROUGE-1 F1,ROUGE-2 F1,ROUGE-L F1
+Do mitochondria play a role in remodelling lace plant leaves...,0.1441,0.055,0.1261
+Landolt C and snellen e acuity: differences in strabismus am...,0.3939,0.125,0.2424
+"Syncope during bathing in infants, a pediatric form of water...",0.56,0.2609,0.48
+Are the long-term results of the transanal pull-through equa...,0.2651,0.0988,0.1928
+Can tailored interventions increase mammography use among HM...,0.1345,0.0,0.084
+Double balloon enteroscopy: is it efficacious and safe in a ...,0.3036,0.0364,0.1607
+30-Day and 1-year mortality in emergency general surgery lap...,0.378,0.08,0.2205
+Is adjustment for reporting heterogeneity necessary in sleep...,0.2169,0.0741,0.1928
+Do mutations causing low HDL-C promote increased carotid int...,0.1333,0.0,0.1333
+A short stay or 23-hour ward in a general and academic child...,0.3061,0.125,0.2245

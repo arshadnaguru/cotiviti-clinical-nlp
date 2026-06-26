@@ -1,0 +1,9 @@
+Query,Expected,Exact Match,Partial Match
+What is the HbA1c value in the lab report?,8.1%,1,1
+What is the eGFR value?,52,1,1
+What is the LDL cholesterol value?,142,1,1
+What is the Metformin dose?,1000mg,1,1
+What is the fasting glucose in the lab report?,174 mg/dL,1,1
+What is the creatinine level?,1.4 mg/dL,1,1
+What is the Semaglutide starting dose?,0.25mg,1,1
+What is the urine ACR value?,48 mg/g,1,1
