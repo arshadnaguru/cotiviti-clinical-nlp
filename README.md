@@ -8,7 +8,7 @@
 
 ## 🚀 Live Demo
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://arshadnaguru-cotiviti-clinical-nlp.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cotiviti-clinical-nlp.streamlit.app/)
 
 > Paste any clinical note → extract biomedical entities → retrieve relevant context → generate a structured SOAP note with ICD-10 codes
 
