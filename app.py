@@ -276,12 +276,11 @@ def call_groq(prompt, groq_api_key, max_tokens=600):
 with st.sidebar:
     st.markdown("### ⚙️ Configuration")
 
-    groq_api_key = st.text_input(
-        "Groq API Key",
-        type="password",
-        placeholder="gsk_...",
-        help="Get free key at console.groq.com"
-    )
+    # Read API key from Streamlit secrets (set in deployment)
+    try:
+        groq_api_key = st.secrets["GROQ_API_KEY"]
+    except Exception:
+        groq_api_key = ""
 
     st.markdown("---")
     st.markdown("### 🔧 Pipeline Settings")
@@ -373,14 +372,7 @@ with tab1:
     else:
         st.text_area("Clinical Note:", value=note_text, height=180, disabled=True)
 
-    if not groq_api_key:
-        st.markdown("""
-        <div class="info-box">
-        ⚠️ Add your Groq API key in the sidebar to enable SOAP note generation.
-        Get a free key at <b>console.groq.com</b> — no credit card needed.
-        NER entity extraction works without the API key.
-        </div>
-        """, unsafe_allow_html=True)
+    # API key loaded from secrets automatically
 
     run_btn = st.button("🚀 Run Full Pipeline", type="primary", use_container_width=True)
 
@@ -562,7 +554,7 @@ Suggested ICD-10 Codes (list the most relevant)"""
                     use_container_width=True
                 )
             elif not groq_api_key:
-                st.info("Add Groq API key in sidebar to generate SOAP note.")
+                st.info("SOAP note generation unavailable — API configuration issue.")
             else:
                 st.warning("Generation failed. Check API key.")
 
@@ -619,23 +611,20 @@ with tab2:
     ask_btn = st.button("🔍 Ask the Pipeline", type="primary", use_container_width=True)
 
     if ask_btn and user_query.strip():
-        if not groq_api_key:
-            st.error("Groq API key required for Q&A. Add it in the sidebar.")
-        else:
-            with st.spinner("Loading models..."):
-                try:
-                    ner_pipe_qa = load_ner_model()
-                    embedder_qa = load_embedder()
-                    faiss_index_qa, all_chunks_qa = build_faiss_index(embedder_qa)
-                except Exception as e:
-                    st.error(f"Model loading failed: {e}")
-                    st.stop()
+        with st.spinner("Loading models..."):
+            try:
+                ner_pipe_qa = load_ner_model()
+                embedder_qa = load_embedder()
+                faiss_index_qa, all_chunks_qa = build_faiss_index(embedder_qa)
+            except Exception as e:
+                st.error(f"Model loading failed: {e}")
+                st.stop()
 
-            with st.spinner("Retrieving + generating answer..."):
-                retrieved_qa = retrieve_chunks(user_query, embedder_qa, faiss_index_qa, all_chunks_qa, top_k)
-                ctx_qa = "\n\n".join([f"[{r['doc']}]\n{r['text']}" for r in retrieved_qa])
+        with st.spinner("Retrieving + generating answer..."):
+            retrieved_qa = retrieve_chunks(user_query, embedder_qa, faiss_index_qa, all_chunks_qa, top_k)
+            ctx_qa = "\n\n".join([f"[{r['doc']}]\n{r['text']}" for r in retrieved_qa])
 
-                prompt_qa = f"""You are a clinical AI assistant. Answer the question using ONLY the provided patient record context.
+            prompt_qa = f"""You are a clinical AI assistant. Answer the question using ONLY the provided patient record context.
 
 PATIENT RECORD CONTEXT:
 {ctx_qa}
@@ -644,36 +633,36 @@ QUESTION: {user_query}
 
 Provide a structured, accurate answer. Cite the source document for each fact. Use clinical terminology."""
 
-                try:
-                    answer = call_groq(prompt_qa, groq_api_key, max_tokens=400)
-                except Exception as e:
-                    st.error(f"Groq API error: {e}")
-                    st.stop()
+            try:
+                answer = call_groq(prompt_qa, groq_api_key, max_tokens=400)
+            except Exception as e:
+                st.error(f"Groq API error: {e}")
+                st.stop()
 
-            st.markdown("---")
-            col_a, col_b = st.columns([3, 2])
+        st.markdown("---")
+        col_a, col_b = st.columns([3, 2])
 
-            with col_a:
-                st.markdown("#### 🤖 Answer")
+        with col_a:
+            st.markdown("#### 🤖 Answer")
+            st.markdown(f"""
+            <div style="background:#F8FAFC;border-left:4px solid #0D4F8B;
+                        padding:16px 20px;border-radius:0 10px 10px 0;
+                        font-size:0.93rem;color:#334155;line-height:1.7;">
+                {answer.replace(chr(10), '<br>')}
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col_b:
+            st.markdown("#### 📚 Retrieved Sources")
+            for r in retrieved_qa:
                 st.markdown(f"""
-                <div style="background:#F8FAFC;border-left:4px solid #0D4F8B;
-                            padding:16px 20px;border-radius:0 10px 10px 0;
-                            font-size:0.93rem;color:#334155;line-height:1.7;">
-                    {answer.replace(chr(10), '<br>')}
+                <div class="retrieved-chunk">
+                    <div class="chunk-source">
+                        📄 {r['doc']} · {r['similarity_score']:.4f}
+                    </div>
+                    {r['text'][:200]}...
                 </div>
                 """, unsafe_allow_html=True)
-
-            with col_b:
-                st.markdown("#### 📚 Retrieved Sources")
-                for r in retrieved_qa:
-                    st.markdown(f"""
-                    <div class="retrieved-chunk">
-                        <div class="chunk-source">
-                            📄 {r['doc']} · {r['similarity_score']:.4f}
-                        </div>
-                        {r['text'][:200]}...
-                    </div>
-                    """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 3 — EVALUATION DASHBOARD
